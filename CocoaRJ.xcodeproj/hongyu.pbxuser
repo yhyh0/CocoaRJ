@@ -1,0 +1,150 @@
+// !$*UTF8*$!
+{
+	29B97313FDCFA39411CA2CEA /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = 58F67D990FE0A3230018CE8F /* CocoaRJ */;
+		activeTarget = 8D1107260486CEB800E47090 /* CocoaRJ */;
+		codeSenseManager = 58F67DAB0FE0A3290018CE8F /* Code sense */;
+		executables = (
+			58F67D990FE0A3230018CE8F /* CocoaRJ */,
+			58F67D9A0FE0A3230018CE8F /* HelperTool */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					362,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					322,
+					60,
+					20,
+					48.16259765625,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 266483397;
+			PBXWorkspaceStateSaveDate = 266483397;
+		};
+		sourceControlManager = 58F67DAA0FE0A3290018CE8F /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	58F67D990FE0A3230018CE8F /* CocoaRJ */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = CocoaRJ;
+		sourceDirectories = (
+		);
+	};
+	58F67D9A0FE0A3230018CE8F /* HelperTool */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = HelperTool;
+		sourceDirectories = (
+		);
+	};
+	58F67DAA0FE0A3290018CE8F /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+	};
+	58F67DAB0FE0A3290018CE8F /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	8D1107260486CEB800E47090 /* CocoaRJ */ = {
+		activeExec = 0;
+		executables = (
+			58F67D990FE0A3230018CE8F /* CocoaRJ */,
+		);
+	};
+	967D03D70FD530AB009DB940 /* RJShellTool.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {940, 10346}}";
+			sepNavSelRange = "{10896, 0}";
+			sepNavVisRange = "{10498, 1062}";
+			sepNavWindowFrame = "{{15, -1}, {999, 742}}";
+		};
+	};
+	967D04020FD532AF009DB940 /* MainController.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {940, 6412}}";
+			sepNavSelRange = "{5409, 0}";
+			sepNavVisRange = "{4365, 1471}";
+			sepNavWindowFrame = "{{12, 4}, {999, 742}}";
+		};
+	};
+	967D064A0FD58E08009DB940 /* HelperTool */ = {
+		activeExec = 0;
+		executables = (
+			58F67D9A0FE0A3230018CE8F /* HelperTool */,
+		);
+	};
+}
