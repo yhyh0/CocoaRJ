@@ -3,10 +3,31 @@
  *  
  *
  *  Created by zhou hongyu on 08-2-26.
- *  Copyright 2008 __MyCompanyName__. All rights reserved.
+ *  Modified by Yin Hou in Aug 2010, Jan 2011
+ *  Hongyu Zhou <hongyv.zhou@gmail.com>
+ *  Yin Hou <alanhoucts@Gmail.com>
+ *  All rights reserved.
  *
- *	改写后请注意更改mainController内的MD5验证信息
+ *	don't forget to modify MD5 values in mainController, whenever you changed this file
+ 
+ 
+ This file is part of CocoaRJ.
+ 
+ CocoaRJ is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ CocoaRJ is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with CocoaRJ.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+
 
 #import <SystemConfiguration/SCNetworkConfiguration.h>
 #include <stdio.h>
@@ -44,13 +65,13 @@ typedef unsigned short 	int16;
 typedef unsigned long 		int32;
 
 struct bpf_insn insns[] = {
-	BPF_STMT(BPF_LD+BPF_H+BPF_ABS, 12),								//加载以太网链路层的类型
-	BPF_JUMP(BPF_JMP+BPF_JEQ+BPF_K, ETHERTYPE_8021X, 0, 1),			//判断是否是802.1X数据包，是则返回给本程序->0,else ->1
+	BPF_STMT(BPF_LD+BPF_H+BPF_ABS, 12),								//type
+	BPF_JUMP(BPF_JMP+BPF_JEQ+BPF_K, ETHERTYPE_8021X, 0, 1),			//check if it is an 802.1X package，yes ->0,no ->1
 	BPF_STMT(BPF_RET+BPF_K, (u_int)-1),								// 0
 	BPF_STMT(BPF_RET+BPF_K, 0),										// 1
 };
 
-//EAPOL在Ethernet上的帧格式
+//EAPOL on Ethernet format
 typedef struct EAPOLforEthernet {
 	int16		ethertype;
 	int8 		version;
@@ -58,7 +79,7 @@ typedef struct EAPOLforEthernet {
 	int16 		length;
 } EAPOL;
 
-//EAP的帧格式
+//EAP format
 typedef struct EAPformat {				
 	int8 		code;
 	int8 		id;
@@ -71,8 +92,8 @@ typedef union {
 	u_int8_t    btValue[2];
 } ULONG_BYTEARRAY;
 
-ULONG_BYTEARRAY  m_serialNo;		//序列号,收到第一个有效的Authentication-Success-packet时初始化
-ULONG_BYTEARRAY  m_key;				//密码加密键值,在main()函数开始时初始化
+ULONG_BYTEARRAY  m_serialNo;		//s/n, initialized when recived an Authentication-Success-packet
+ULONG_BYTEARRAY  m_key;				
 
 unsigned char pad[144] = {          //Ruijie OEM Extra （V2.56）    by soar
           ////////////////////////////////////////////////////////////////////////////
@@ -132,7 +153,7 @@ unsigned char pad[144] = {          //Ruijie OEM Extra （V2.56）    by soar
           0x1A,0x08,0x00,0x00,0x13,0x11,0x2F,0x02   	// Const strings
 };
 
-//echo包，用于每20秒钟激活一次 
+//echo package, send per 20s
 char echoPackage[] = {			
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x88,0x8E,0x01,0xBF, 
 	0x00,0x1E,
@@ -146,8 +167,8 @@ unsigned char m_netmask[4] = {0x00, 0x00, 0x00, 0x00};
 unsigned char m_netgate[4]= {0x00, 0x00, 0x00, 0x00};
 unsigned char m_dns1[4] = {0x00, 0x00, 0x00, 0x00};
 
-char standardMAC[6]={0x01,0x80,0xc2,0x00,0x00,0x03};		//	标准802.1X组播MAC地址
-char localMAC[6]={0x00,0x0d,0x93,0x2a,0xd6,0xe0};			// 	本机MAC地址
+char standardMAC[6]={0x01,0x80,0xc2,0x00,0x00,0x03};		//	standard 802.1X broadcast MAC address
+char localMAC[6]={0x00,0x0d,0x93,0x2a,0xd6,0xe0};			// 	loca MAC address
 
 
 char *nic;
@@ -325,8 +346,8 @@ static OSStatus GetToolPath(CFStringRef bundleID, CFStringRef toolName, char *to
 
 
 /*
-	将1Byte的十六进制数转化为相应的两个ASCII码
-	0xa5 --> 'a' '5' 分别保存到hex[0][1]
+	convert 1Byte hex to two ASCII values
+	0xa5 --> 'a' '5' stored to hex[0][1]
  */
 
 void b2hex(unsigned char byte)
@@ -337,8 +358,8 @@ void b2hex(unsigned char byte)
 }
 
 /*
-	根据服务器发送的16bytes的MD5种子和./8021x.exe中相应内容
-	计算MD5-challenge Response包中32bytes
+	make MD5-challenge Response package 32bytes, base on 16bytes MD5 seed and ./8021x.exe
+
 	abs_addr:0x60 --> 0x7F;
 	rel_addr:78 --> 120
  */
@@ -371,7 +392,6 @@ void hash8021x(unsigned char* md5get)
 
 		MD5Init(&context);
 
-		//计算md5值 
 		MD5Update(&context, temp, 0x4a10);
 		MD5Final(tableC+index, &context);
 		index += 0x10;
@@ -381,7 +401,6 @@ void hash8021x(unsigned char* md5get)
 	unsigned char md5_final[16];
 
 		MD5Init(&context);
-		//计算md5值 
 		MD5Update(&context, tableC, 144); 
 		MD5Final(md5_final, &context);
 
@@ -393,79 +412,10 @@ void hash8021x(unsigned char* md5get)
 
 }
 
-void sig_intr(int signo);		//发送logoff包 on exit with Ctrl+C
+void sig_intr(int signo);		//send logoff package on exit with Ctrl+C
 
 
 
-/*
-static OSStatus DoRuijie(
-						 AuthorizationRef			auth,
-						 const void *                userData,
-						 CFDictionaryRef				request,
-						 CFMutableDictionaryRef      response,
-						 aslclient                   asl,
-						 aslmsg                      aslMsg
-)
-// Implements the kSampleGetUIDsCommand.  Gets the process's three UIDs and 
-// adds them to the response dictionary.
-{	
-	NSLog(@"DoRuijie");
-	
-	 OSStatus					retval = noErr;
-    int                         err;
-	uid_t						euid;
-	uid_t						ruid;
-	CFNumberRef					values[2];
-	long long					tmp;
-	
-	// Pre-conditions
-	
-	assert(auth != NULL);
-    // userData may be NULL
-	assert(request != NULL);
-	assert(response != NULL);
-    // asl may be NULL
-    // aslMsg may be NULL
-	
-    // Get the UIDs.
-    
-	euid = geteuid();
-	ruid = getuid();
-	
-	err = asl_log(asl, aslMsg, ASL_LEVEL_DEBUG, "euid=%ld, ruid=%ld", (long) euid, (long) ruid);
-    assert(err == 0);
-	
-    // Add them to the response.
-    
-	tmp = euid;
-	values[0] = CFNumberCreate(NULL, kCFNumberLongLongType, &tmp);
-	tmp = ruid;
-	values[1] = CFNumberCreate(NULL, kCFNumberLongLongType, &tmp);
-	
-	if ( (values[0] == NULL) || (values[1] == NULL) ) {
-		retval = coreFoundationUnknownErr;
-    } else {
-        CFDictionaryAddValue(response, CFSTR(kSampleRuijieResponseRUID), values[0]);
-        CFDictionaryAddValue(response, CFSTR(kSampleRuijieResponseEUID), values[1]);
-	}
-	
-	if (values[0] != NULL) {
-		CFRelease(values[0]);
-	}
-	if (values[1] != NULL) {
-		CFRelease(values[1]);
-	}
-	
-	return retval;
-	
-	 
-}
-
-static const BASCommandProc kSampleCommandProcs[] = {
-DoRuijie,
-NULL
-};
-*/
 
 int main(int argc, char * argv[])
 {
@@ -496,7 +446,7 @@ int main(int argc, char * argv[])
 	*/
 	struct bpf_program bpf_pro={4,insns};
 	
-	struct timeval timeout={1,0};	//设置BPF 1秒的超时
+	struct timeval timeout={1,0};	//BPF 1s timeout
 	//unsigned char *bufmd5;
 	// ?????
 	unsigned char bufmd5[23];		// id(1Byte)+password(6Bytes)+md5seed(16Bytes)
@@ -514,7 +464,7 @@ int main(int argc, char * argv[])
 	int passlen=strlen(pass);
 	
 	/*
-		TODO：判断是否有物理连接
+		TODO：check connection
 	 */
 	
 	// bpf0,1,2,3, TODO: automatic choose one avaiable
@@ -527,7 +477,7 @@ int main(int argc, char * argv[])
 	}
 	
 	// TODO: learning ioctl
-	strcpy(ifr.ifr_name, nic);//设置BPF的网络接口
+	strcpy(ifr.ifr_name, nic);//set BPF network interface
 	if(	(-1==ioctl(bpf,BIOCSETIF,&ifr))||(-1==ioctl(bpf,BIOCGBLEN,&blen))|| 
 		(-1==ioctl(bpf,BIOCSETF,&bpf_pro))||(-1==ioctl(bpf,BIOCSRTIMEOUT,&timeout))
 	)
@@ -554,7 +504,7 @@ int main(int argc, char * argv[])
 	}
 
 	signal(SIGINT,sig_intr);  //exit with Ctrl+C
-	signal(SIGTERM,sig_intr);  //关机时发logoff EAPOL
+	signal(SIGTERM,sig_intr);  //send when logoff EAPOL
 	signal(SIGQUIT,sig_intr);
  
 retry:
@@ -573,7 +523,7 @@ retry:
 		
 
 
-	//构造802.1X的EAPOL-Start帧
+	//create 802.1X EAPOL-Start frame
 	//fprintf(stdout, "send EAPOL_Start packet... \n");
 
 	memset(buf,0,blen);
@@ -600,7 +550,7 @@ retry:
 	}
 	//fprintf(stdout, "done!\n");
  
-	//读取EAP Request Identity帧
+	//read EAP Request Identity frame
 	//fprintf(stdout, "Reading EAP Request Identity... \n");
 	FD_ZERO(&readset);
 	FD_SET(bpf, &readset);
@@ -644,7 +594,7 @@ retry:
 	memcpy(dstMAC,p+6,6);
 	//fprintf(stdout, "done!\n");
  
-	//构造EAP Response Identity帧
+	//create EAP Response Identity frame
 	//fprintf(stdout, "send EAP Response Identity packet... \n");
 	memset(buf,0,blen);
 	memcpy(buf,dstMAC,6);
@@ -660,7 +610,7 @@ retry:
 	//memcpy(pad+78,random_1,sizeof(random_1));
 	memcpy(buf+12+sizeof(EAPOL)+sizeof(EAP)+namelen,pad,sizeof(pad));
 	
-	if(1000!=write(bpf,buf,1000)) //发送EAP Response Identity帧
+	if(1000!=write(bpf,buf,1000)) //send EAP Response Identity frame
 	{
 		fprintf(stdout, "write EAP Response Identity error\n");
 		fflush(stdout);
@@ -669,7 +619,7 @@ retry:
 	}
 	//fprintf(stdout, "done!\n");
  
-	//读取EAP Request MD5-Challenge帧
+	//read EAP Request MD5-Challenge frame
 	//fprintf(stdout, "Reading EAP Request MD5-Challenge...\n");
 	FD_ZERO(&readset);
 	FD_SET(bpf, &readset);
@@ -721,7 +671,7 @@ retry:
       octets consisting of the Identifier, followed by (concatenated
       with) the "secret", followed by (concatenated with) the Challenge
       Value.  The length of the Response Value depends upon the hash
-      algorithm used (16 octets for MD5).见RFC1994*/
+      algorithm used (16 octets for MD5).please refer to RFC1994*/
 	
 	memset(bufmd5,0,1+challengelen+passlen);
 	*bufmd5=id;  // get id;
@@ -736,18 +686,18 @@ retry:
 	hash8021x(md5_temp);
 	
 	MD5Init(&context);
-	//计算md5值 
+	//md5 
 	MD5Update(&context, bufmd5, 1+challengelen+passlen); 
 	MD5Final(md5Hash, &context); 
  
-	//构造EAP Response MD5-Challenge帧
+	//create EAP Response MD5-Challenge frame
 	//fprintf(stdout, "send EAP Response MD5-Challenge packet... \n");
 	memset(buf,0,blen);
 	memcpy(buf,dstMAC,6);
 	((EAPOL *)(buf+12))->ethertype=htons(0x888E);
 	((EAPOL *)(buf+12))->version=1;
 	((EAPOL *)(buf+12))->type=EAPOL_Packet; //0x00
-	//((EAPOL *)(buf+12))->length=htons(sizeof(EAP)+namelen+challengelen+1);//这里的1是EAP里的value-size
+	//((EAPOL *)(buf+12))->length=htons(sizeof(EAP)+namelen+challengelen+1);//here "1" is the value-size of EAP
 	
 	if(isIntel()){
 		((EAPOL *)(buf+12))->length=(0x1e00 - (8 - namelen)*0x0100);
@@ -759,12 +709,12 @@ retry:
 	((EAP *)(buf+12+sizeof(EAPOL)))->id=id;  
 	((EAP *)(buf+12+sizeof(EAPOL)))->length=htons(sizeof(EAP)+namelen+challengelen+1); //0x10?
 	((EAP *)(buf+12+sizeof(EAPOL)))->type=EAP_TYPE_MD5Challenge; 
-	*(char *)(buf+12+sizeof(EAPOL)+sizeof(EAP))=16;			//md5 hash长度
+	*(char *)(buf+12+sizeof(EAPOL)+sizeof(EAP))=16;			//md5 hash length
 	
 	memcpy(buf+12+sizeof(EAPOL)+sizeof(EAP)+1,md5Hash,16);
 	memcpy(buf+12+sizeof(EAPOL)+sizeof(EAP)+1+16,name,namelen);
 	
-	memcpy(pad+78,Rjhash,sizeof(Rjhash));		// 写入32bytes(78->120)的md5hash
+	memcpy(pad+78,Rjhash,sizeof(Rjhash));		// write 32bytes(78->120) md5hash
 	FillNetParamater( &pad[0x05]);
 	memcpy( pad+130, localMAC, 6);	
 	memcpy(buf+12+sizeof(EAPOL)+sizeof(EAP)+1+16+namelen,pad,sizeof(pad));
@@ -781,7 +731,7 @@ retry:
 // 	fprintf(stdout, "After MD5Final! \n");
 
  
-	//读取EAP success或fail帧
+	//read EAP success/fail frame
 	//fprintf(stdout, "Reading EAP success or fail...\n");
 	FD_ZERO(&readset);
 	FD_SET(bpf, &readset);
@@ -810,7 +760,7 @@ retry:
 		goto retry;
 	}
 
-	// 读取服务器信息
+	// read server info
 	char msg[0x88];		
 	memcpy(msg, p+0x17, 0x88);
 	FILE *fp;
@@ -837,7 +787,7 @@ retry:
 		fprintf(stdout, "Ruijie authentication success! \n");
 		fflush(stdout);
 
-		//AUTHEN_TIMES++;									//认证计数器
+		//AUTHEN_TIMES++;									
 		offset=ntohs( *((int16*)(p+0x10)) ); 
 		uTemp.ulValue = *((int16 *)(p+(0x12+offset)-0x07));
 		
@@ -943,7 +893,7 @@ retry:
 
 		goto retry;
 	}
-	close(bpf);//不会到这
+	close(bpf);//shouldnt reach here
 	return 0;
 }
 
@@ -952,7 +902,7 @@ void sig_intr(int signo)
 {
 	if(buf!=NULL)
 	{
- 	//构造802.1X的EAPOL-Logoff帧
+ 	//create 802.1X EAPOL-Logoff frame
 		memset(buf,0,blen);
 		if( (dstMAC[0]==0)&&(dstMAC[1]==0)&&(dstMAC[2]==0) )
 			memcpy(buf,standardMAC,6); 
@@ -963,7 +913,7 @@ void sig_intr(int signo)
 		((EAPOL *)(buf+12))->version=1;
 		((EAPOL *)(buf+12))->type=EAPOL_Logoff;
 		((EAPOL *)(buf+12))->length=0;
-		if((12+sizeof(EAPOL))!= write(bpf,buf,12+sizeof(EAPOL))) //发送802.1X的EAPOL-Logoff帧
+		if((12+sizeof(EAPOL))!= write(bpf,buf,12+sizeof(EAPOL))) //send 802.1X EAPOL-Logoff frame
 		{
 			fprintf(stdout, "write EAPOL_Logoff error");
 			fflush(stdout);

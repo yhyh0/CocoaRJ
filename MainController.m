@@ -2,9 +2,27 @@
 //  MainController.m
 //  CocoaRJ
 //
-//  Created by HouYin on 6/2/09.
+//  Created by Yin Hou on 6/2/09.
+//  alanhoucts@Gmail.com
 //  Copyright 2009 SCU. All rights reserved.
 //
+/*
+ This file is part of CocoaRJ.
+ 
+ CocoaRJ is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ CocoaRJ is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with CocoaRJ.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #import "MainController.h"
 #import "md5.h"
 #import <Security/Authorization.h>
@@ -169,7 +187,8 @@ static OSStatus GetToolPath(CFStringRef bundleID, CFStringRef toolName, char *to
 	authFlags = kAuthorizationFlagDefaults;
 	
 	// add md5 check
-	unsigned char md5check[0x10]={0x70, 0xbc, 0x8f, 0x4b, 0x72, 0xa8, 0x69, 0x21, 0x46, 0x8b, 0xf8, 0xe8, 0x44, 0x1d, 0xce, 0x51};
+	//	ae07009948e7bc82fb04268ce297d0c1
+	unsigned char md5check[0x10]={0xae, 0x07, 0x00, 0x99, 0x48, 0xe7, 0xbc, 0x82, 0xfb, 0x04, 0x26, 0x8c, 0xe2, 0x97, 0xd0, 0xc1};
 	unsigned char temp[0x20];
 	unsigned char md5_result[0x10];
 	char _md5path[PATH_MAX];

@@ -2,7 +2,8 @@
 //  MainController.h
 //  CocoaRJ
 //
-//  Created by HouYin on 6/2/09.
+//  Created by Yin Hou on 6/2/09.
+//  alanhoucts@Gmail.com
 //  Copyright 2009 SCU. All rights reserved.
 //
 
