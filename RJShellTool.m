@@ -752,6 +752,7 @@ retry:
 	}
 	
 	p=buf+((struct bpf_hdr *)buf)->bh_hdrlen;
+	/*
 	if( (((EAPOL *)(p+12))->type!=EAPOL_Packet)||(((EAP *)(p+12+sizeof(EAPOL)))->id!=id) )
 	{
 		fprintf(stdout, "EAP result packet error! \n");
@@ -759,7 +760,7 @@ retry:
 
 		goto retry;
 	}
-
+*/
 	// read server info
 	char msg[0x88];		
 	memcpy(msg, p+0x17, 0x88);

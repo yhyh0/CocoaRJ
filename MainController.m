@@ -188,7 +188,9 @@ static OSStatus GetToolPath(CFStringRef bundleID, CFStringRef toolName, char *to
 	
 	// add md5 check
 	//	ae07009948e7bc82fb04268ce297d0c1
-	unsigned char md5check[0x10]={0xae, 0x07, 0x00, 0x99, 0x48, 0xe7, 0xbc, 0x82, 0xfb, 0x04, 0x26, 0x8c, 0xe2, 0x97, 0xd0, 0xc1};
+	//  32f7d793886888c1e4c67ff09ccce27a
+
+	unsigned char md5check[0x10]={0x32, 0xf7, 0xd7, 0x93, 0x88, 0x68, 0x88, 0xc1, 0xe4, 0xc6, 0x7f, 0xf0, 0x9c, 0xcc, 0xe2, 0x7a};
 	unsigned char temp[0x20];
 	unsigned char md5_result[0x10];
 	char _md5path[PATH_MAX];
@@ -201,16 +203,16 @@ static OSStatus GetToolPath(CFStringRef bundleID, CFStringRef toolName, char *to
 	
 	fseek(htfile, 0x612, 0);
 	fread(temp, 0x20, 1, htfile);
-	
+	/*
 	MD5_CTX context;
 	MD5Init(&context);
 	
 	MD5Update(&context, temp, 0x20);
 	MD5Final(md5_result, &context);
 	int i;
-//	printf("md5:");
+	printf("md5:");
 	for (i = 0;i < 0x10; i++){
-		//printf("%x ", md5_result[i]);
+		printf("%x ", md5_result[i]);
 		if (md5check[i]!=md5_result[i]) {
 			NSImage *myImage = [NSImage imageNamed: @"IconError"];
 			[NSApp setApplicationIconImage: myImage];
@@ -221,6 +223,7 @@ static OSStatus GetToolPath(CFStringRef bundleID, CFStringRef toolName, char *to
 		}
 			
 	}
+	 */
 //	printf("\n");
 	
 	
