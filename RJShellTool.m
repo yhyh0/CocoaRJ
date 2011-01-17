@@ -541,7 +541,7 @@ retry:
 	//memcpy(buf+0x17, pad, 0x90);
 
 	//???
-	if(1000 != write(bpf,buf,1000)) //发送802.1X的EAPOL-Start帧
+	if(1000 != write(bpf,buf,1000)) //send 802.1X EAPOL-Start frame
 	{
 		fprintf(stdout, "write EAPOL_Start error\n");
 		fflush(stdout);
@@ -752,15 +752,82 @@ retry:
 	}
 	
 	p=buf+((struct bpf_hdr *)buf)->bh_hdrlen;
-	/*
+	
 	if( (((EAPOL *)(p+12))->type!=EAPOL_Packet)||(((EAP *)(p+12+sizeof(EAPOL)))->id!=id) )
 	{
-		fprintf(stdout, "EAP result packet error! \n");
+		fprintf(stdout, "EAP result packet error! \n"); //maybe it is not an error?
 		fflush(stdout);
-
+		BOOL hadFun = NO;
+		if (system("ifconfig en0| grep 'inet '| grep ' 169.' > /dev/null")) {
+			fprintf(stdout, "IP address: ");
+			fflush(stdout);
+			system("ifconfig en0| grep 'inet '| cut -d ' ' -f 2");
+			fflush(stdout);
+			fprintf(stdout, "Have Fun :)\n");
+			fflush(stdout);
+			hadFun = YES;
+			
+		}
+		int i = 20;
+		while(1) {
+			
+			fprintf(stdout, "echo\n");
+			fflush(stdout);
+			if((i%8 == 0)&&(hadFun == NO)){
+				if (!system("ifconfig en0| grep 'inet '| grep ' 169.' > /dev/null")) {
+					fprintf(stdout, "IP address: ");
+					fflush(stdout);
+					system("ifconfig en0| grep 'inet '| cut -d ' ' -f 2");
+					fflush(stdout);
+						//			system("ifconfig en0 down");
+						//			system("ifconfig en0 up");
+					if(setAsDHCPAndRenew() == FALSE){
+						fprintf(stdout, "Renew DHCP Fail error!\n");
+						fflush(stdout);
+					}
+					else{
+						fprintf(stdout, "No public IP address distributed, DHCP renewed! \n");
+						fflush(stdout);
+					}
+				}
+				else{
+					if(hadFun == NO){
+						fprintf(stdout, "IP address: ");
+						fflush(stdout);
+						system("ifconfig en0| grep 'inet '| cut -d ' ' -f 2");
+						fflush(stdout);
+						fprintf(stdout, "Have Fun :)\n");
+						fflush(stdout);
+						hadFun = YES;
+					}
+				}
+			}
+			if(i==0){
+				ULONG_BYTEARRAY uCrypt1,uCrypt2,uCrypt1_After,uCrypt2_After; 
+				m_serialNo.ulValue++; 
+					//m_serialNo is initialized at the beginning of main() of main.c, and 
+					//m_key is initialized in main.c when the 1st Authentication-Success packet is received. 
+				uCrypt1.ulValue = m_key.ulValue + m_serialNo.ulValue; 
+				uCrypt2.ulValue = m_serialNo.ulValue; 
+				memcpy( echoPackage, dstMAC, 6 ); 
+				uCrypt1_After.ulValue = htonl( uCrypt1.ulValue ); 
+				uCrypt2_After.ulValue = htonl( uCrypt2.ulValue ); 
+				
+				echoPackage[0x1a] = Alog(uCrypt1_After.btValue[0]); 
+				echoPackage[0x1b] = Alog(uCrypt1_After.btValue[1]);
+				echoPackage[0x24] = Alog(uCrypt2_After.btValue[0]); 
+				echoPackage[0x25] = Alog(uCrypt2_After.btValue[1]);
+				while(write(bpf,echoPackage, 0x2d)!=0x2d);
+				ioctl(bpf,BIOCFLUSH);
+				i = 20;
+			}
+			i--;
+			sleep(1);
+		}
+		
 		goto retry;
 	}
-*/
+
 	// read server info
 	char msg[0x88];		
 	memcpy(msg, p+0x17, 0x88);
